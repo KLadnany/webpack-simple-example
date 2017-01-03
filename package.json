@@ -4,7 +4,7 @@
   "description": "Simple example to bundle JS and CSS with Webpack",
   "main": "index.js",
   "scripts": {
-    "build-dev": "webpack --config webpack.config-dev.js --progress",
+    "build-dev": "webpack --config webpack.config.dev.js --progress",
     "build-prod": "webpack --config webpack.config.prod.js --progress"
   },
   "keywords": [],
