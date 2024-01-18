@@ -1,49 +1,45 @@
 var path = require('path');
 var webpack = require('webpack');
-var combineLoaders = require('webpack-combine-loaders');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
+var TerserPlugin = require("terser-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+
+
 
 module.exports = {
+  mode: 'production',
   entry: ['./src/index.js'],
   output: {
     path: path.join(__dirname, 'build'),
-     filename: 'bundle.js'
+    filename: 'app.js'
   },
   plugins: [
-    new ExtractTextPlugin('bundle.css'),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "public", "index.html")
+    }),
+    new MiniCssExtractPlugin(),
     new webpack.DefinePlugin({
       'process.env': {
         'NODE_ENV': JSON.stringify('production')
       }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false
-      },
-      comments: false
-    }),
+    })
   ],
- module: {
-    loaders: [
+  module: {
+    rules: [
       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-            presets: ['es2015']
-         }
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['babel-loader']
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader")
-      },
-      {
-        test: /\.scss$/, 
-        loader: ExtractTextPlugin.extract(
-            'style', // backup loader when not building .css file
-            'css!sass' // loaders to preprocess CSS
-        )
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       }
     ]
-  }
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin(), new CssMinimizerPlugin()],
+  },
 };
